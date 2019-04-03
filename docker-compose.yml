@@ -1,0 +1,12 @@
+version: '2.2'
+
+services:
+  db:
+  
+    image: postgres:latest
+    environment:
+    - POSTGRES_DB=blue
+    - POSTGRES_USER=blue
+    - POSTGRES_PASSWORD=blue
+    ports:
+      - "5000:5432"
