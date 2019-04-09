@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'graphene_django',
     'corsheaders',
     'core.apps.CoreConfig',
-    'accounts.apps.AccountsConfig'
+    'accounts.apps.AccountsConfig',
+    'api.apps.ApiConfig'
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,6 @@ ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_METHODS = ("DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT")
 CORS_ALLOW_CREDENTIALS = True
+
+# graphene setting
+GRAPHENE = {"SCHEMA": "api.schema.schema"}
