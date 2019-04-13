@@ -12,7 +12,6 @@ graphene-django = "*"
 [dev-packages]
 django-admin = "*"
 "flake8" = "*"
-black = "*"
 
 [requires]
 python_version = "3.6"

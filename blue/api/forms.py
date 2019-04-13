@@ -12,7 +12,7 @@ class RegisterForm(forms.ModelForm):
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ("item", "description", "period", "amount", "note")
+        fields = ("description", "period", "amount", "note")
 
 
 class StatisticsForm(forms.ModelForm):

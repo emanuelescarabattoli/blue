@@ -25,16 +25,18 @@ class StatisticsType(DjangoObjectType):
     class Meta:
         model = Statistics
 
+    result = graphene.Float()
 
-class CounterMutation(DjangoModelFormMutation):
+    def resolve_result(self, args):
+        return self.result()
+
+
+class RegisterMutation(DjangoModelFormMutation):
     class Meta:
-        form_class = CounterForm
+        form_class = RegisterForm
 
     @classmethod
     def perform_mutate(cls, form, info):
-        """
-        add user before saving
-        """
         obj = form.save(commit=False)
         obj.user = info.context.user
         obj.save()
@@ -42,7 +44,33 @@ class CounterMutation(DjangoModelFormMutation):
         return cls(errors=[], **kwargs)
 
 
-class CounterDeleteMutation(graphene.Mutation):
+class ItemMutation(DjangoModelFormMutation):
+    class Meta:
+        form_class = ItemForm
+
+    @classmethod
+    def perform_mutate(cls, form, info):
+        obj = form.save(commit=False)
+        obj.user = info.context.user
+        obj.save()
+        kwargs = {cls._meta.return_field_name: obj}
+        return cls(errors=[], **kwargs)
+
+
+class StatisticsMutation(DjangoModelFormMutation):
+    class Meta:
+        form_class = StatisticsForm
+
+    @classmethod
+    def perform_mutate(cls, form, info):
+        obj = form.save(commit=False)
+        obj.user = info.context.user
+        obj.save()
+        kwargs = {cls._meta.return_field_name: obj}
+        return cls(errors=[], **kwargs)
+
+
+class RegisterDeleteMutation(graphene.Mutation):
     class Arguments:
         pk = graphene.Int()
 
@@ -50,56 +78,84 @@ class CounterDeleteMutation(graphene.Mutation):
 
     def mutate(self, info, pk):
 
-        Counter.objects.filter(id=pk).delete()
-        return CounterDeleteMutation(success=True)
+        Register.objects.filter(id=pk).delete()
+        return RegisterDeleteMutation(success=True)
 
+
+class ItemDeleteMutation(graphene.Mutation):
+    class Arguments:
+        pk = graphene.Int()
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, pk):
+
+        Item.objects.filter(id=pk).delete()
+        return ItemDeleteMutation(success=True)
+
+
+class StatisticsDeleteMutation(graphene.Mutation):
+    class Arguments:
+        pk = graphene.Int()
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, pk):
+
+        Statistics.objects.filter(id=pk).delete()
+        return StatisticsDeleteMutation(success=True)
 
 
 class Query(graphene.ObjectType):
     me = graphene.Field(MeObject)
 
-    detail_total = graphene.Field(TotalType, id=graphene.Int())
-    detail_counter = graphene.Field(CounterType, id=graphene.Int())
+    detail_register = graphene.Field(RegisterType, id=graphene.Int())
+    detail_statistics = graphene.Field(StatisticsType, id=graphene.Int())
 
-    list_total = graphene.List(TotalType)
-    list_counter = graphene.List(CounterType)
+    list_register = graphene.List(RegisterType)
+    list_statistics = graphene.List(StatisticsType)
 
     def resolve_me(self, info, **kwargs):
         if info.context.user.is_authenticated:
             return MeObject(username=info.context.user.username)
         return None
 
-    def resolve_detail_total(self, info, **kwargs):
+    def resolve_detail_register(self, info, **kwargs):
         id = kwargs.get("id")
         if id is not None:
-            return Total.objects.get(pk=id)
+            return Register.objects.get(pk=id)
         return None
 
-    def resolve_detail_counter(self, info, **kwargs):
+    def resolve_detail_item(self, info, **kwargs):
         id = kwargs.get("id")
         if id is not None:
-            return Counter.objects.get(pk=id)
+            return Item.objects.get(pk=id)
         return None
 
-    def resolve_list_total(self, info, **kwargs):
-        return Total.objects.filter(user=info.context.user)
+    def resolve_detail_statistics(self, info, **kwargs):
+        id = kwargs.get("id")
+        if id is not None:
+            return Statistics.objects.get(pk=id)
+        return None
 
-    def resolve_list_counter(self, info, **kwargs):
-        return Counter.objects.filter(user=info.context.user)
+    def resolve_list_register(self, info, **kwargs):
+        return Register.objects.filter(user=info.context.user)
+
+    def resolve_list_item(self, info, **kwargs):
+        return Item.objects.filter(user=info.context.user)
+
+    def resolve_list_statistics(self, info, **kwargs):
+        return Statistics.objects.filter(user=info.context.user)
 
 
 class Mutations(graphene.ObjectType):
-    mutation_total = TotalMutation.Field()
-    mutation_total_row = TotalRowMutation.Field()
-    mutation_total_row_total = TotalRowTotalMutation.Field()
-    mutation_counter = CounterMutation.Field()
-    mutation_counter_row = CounterRowMutation.Field()
+    mutation_register = RegisterMutation.Field()
+    mutation_item = ItemMutation.Field()
+    mutation_statistics = StatisticsMutation.Field()
 
-    mutation_delete_counter = CounterDeleteMutation.Field()
-    mutation_delete_counter_row = CounterRowDeleteMutation.Field()
-    mutation_delete_total = TotalDeleteMutation.Field()
-    mutation_delete_total_row = TotalRowDeleteMutation.Field()
-    mutation_delete_total_row_total = TotalRowTotalDeleteMutation.Field()
+    mutation_delete_register = RegisterDeleteMutation.Field()
+    mutation_delete_item = ItemDeleteMutation.Field()
+    mutation_delete_statistics = StatisticsDeleteMutation.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutations)
