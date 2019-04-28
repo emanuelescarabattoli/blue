@@ -4,7 +4,7 @@ from graphene_django.types import DjangoObjectType
 from graphene_django.forms.mutation import DjangoModelFormMutation
 
 from .forms import RegisterForm, ItemForm, StatisticsForm
-from core.models import Register, Item, Statistics
+from core.models import Register, Item, Statistics, calculate_register_amount
 
 
 class MeObject(graphene.ObjectType):
@@ -14,6 +14,11 @@ class MeObject(graphene.ObjectType):
 class RegisterType(DjangoObjectType):
     class Meta:
         model = Register
+
+    amount = graphene.Float()
+
+    def resolve_amount(self, args):
+        return calculate_register_amount(self.id)
 
 
 class ItemType(DjangoObjectType):
