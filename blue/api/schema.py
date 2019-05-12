@@ -116,6 +116,7 @@ class Query(graphene.ObjectType):
 
     detail_register = graphene.Field(RegisterType, id=graphene.Int())
     detail_statistics = graphene.Field(StatisticsType, id=graphene.Int())
+    detail_item = graphene.Field(ItemType, id=graphene.Int())
 
     list_register = graphene.List(RegisterType)
     list_statistics = graphene.List(StatisticsType)
