@@ -17,7 +17,7 @@ class Register(models.Model):
         return self.description
 
 
-class Item(models.Model):
+class RegisterRow(models.Model):
     """
     This model is used to register an accounting row
     linked to a register
@@ -36,62 +36,76 @@ class Item(models.Model):
 
 class Statistics(models.Model):
     """
-    A model used to store user's statistics as a formula
-    such as a sum of counters
+    A model used to store user's statistics
+    a statistics is made by a list of registers and a list of other formulas
     """
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    formula = models.TextField()
     description = models.CharField(max_length=256)
     note = models.TextField(default=None, blank=True)
-
-    def result(self):
-        """
-        This method is used to calculate the result of a formula
-        a formula can contain a sum of Items or Statistics
-        """
-        formula_register_ids = self.parse_formula().get("register_ids")
-        formula_statistics_ids = self.parse_formula().get("statistics_ids")
-        return calculate_statistics(formula_register_ids, formula_statistics_ids)
-
-    def parse_formula(self):
-        """
-        here we return a list of ids of Registers
-        and a list of ids of Statistics starting from the formula
-        """
-        splitted = self.formula.split(";")
-        if len(splitted) == 2:
-            return {"register_ids": splitted[0].split(","), "statistics_ids": splitted[1].split(",")}
-        return {"register_ids": splitted[0].split(","), "statistics_ids": []}
 
     def __str__(self):
         return self.description
 
 
+class StatisticsRowRegister(models.Model):
+    """
+    A model used to store a statistics row
+    linked to a register
+    """
+
+    parent_statistics = models.ForeignKey(Statistics, on_delete=models.CASCADE)
+    register = models.ForeignKey(Register, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.parent_statistics.description} - {self.register.description}"
+
+
+class StatisticsRowStatistics(models.Model):
+    """
+    A model used to store a statistics row
+    linked to a statistics
+    """
+
+    parent_statistics = models.ForeignKey(Statistics, on_delete=models.CASCADE)
+    statistics = models.ForeignKey(Statistics, on_delete=models.CASCADE, related_name="child_statistics")
+
+    def __str__(self):
+        return f"{self.parent_statistics.description} - {self.statistics.description}"
+
+
+def calculate_statistics_result(statistics_id):
+    """
+    This method is used to calculate the result of a statistics
+    """
+    register_ids = StatisticsRowRegister.objects.filter(parent_statistics=statistics_id).values_list('register__id', flat=True)
+    statistics_ids = StatisticsRowStatistics.objects.filter(parent_statistics=statistics_id).values_list('statistics__id', flat=True)
+    return calculate_statistics(register_ids, statistics_ids)
+
+
 def calculate_register_amount(register_id):
     """
-    A function to calculate the sum of a Register's child Items
+    A function to calculate the sum of a register's rows
     """
-    return Item.objects.filter(register=register_id).aggregate(Sum('amount')).get("amount__sum")
+    return RegisterRow.objects.filter(register=register_id).aggregate(Sum('amount')).get("amount__sum")
 
 
-def calculate_registers_sum(ids):
+def calculate_registers_sum(register_ids):
     """
-    A function used to calculate a sum of Register totals
+    A function used to calculate a sum of register totals
     """
     sum = 0
-    for element in ids:
-        sum += calculate_register_amount(element)
+    for register_id in register_ids:
+        sum += calculate_register_amount(register_id)
     return sum
 
 
 def calculate_statistics(register_ids, statistics_ids, total=0):
     """
-    This function is used to calculate a single Statistics result
+    This function is used to calculate a single statistics result
     """
-    total += calculate_registers_sum(register_ids)
-    for element in statistics_ids:
-        formula_register_ids = Statistics.objects.filter(id=element).first().parse_formula().get("register_ids")
-        formula_statistics_ids = Statistics.objects.filter(id=element).first().parse_formula().get("statistics_ids")
-        total += calculate_statistics(formula_register_ids, formula_statistics_ids, total)
-    return total
+    for statistics_id in statistics_ids:
+        child_register_ids = StatisticsRowRegister.objects.filter(parent_statistics=statistics_id).values_list('register', flat=True)
+        child_statistics_ids = StatisticsRowStatistics.objects.filter(parent_statistics=statistics_id).values_list('statistics', flat=True)
+        total += calculate_statistics(child_register_ids, child_statistics_ids, total)
+    return total + calculate_registers_sum(register_ids)

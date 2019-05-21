@@ -1,6 +1,6 @@
 from django import forms
 
-from core.models import Register, Item, Statistics
+from core.models import Register, RegisterRow, Statistics, StatisticsRowRegister, StatisticsRowStatistics
 
 
 class RegisterForm(forms.ModelForm):
@@ -9,13 +9,25 @@ class RegisterForm(forms.ModelForm):
         fields = ("description", "note")
 
 
-class ItemForm(forms.ModelForm):
+class RegisterRowForm(forms.ModelForm):
     class Meta:
-        model = Item
+        model = RegisterRow
         fields = ("description", "period", "amount", "note", "date", "register")
 
 
 class StatisticsForm(forms.ModelForm):
     class Meta:
         model = Statistics
-        fields = ("formula", "description", "note")
+        fields = ("description", "note")
+
+
+class StatisticsRowRegisterForm(forms.ModelForm):
+    class Meta:
+        model = StatisticsRowRegister
+        fields = ("parent_statistics", "register")
+
+
+class StatisticsRowStatisticsForm(forms.ModelForm):
+    class Meta:
+        model = StatisticsRowStatistics
+        fields = ("parent_statistics", "statistics")
