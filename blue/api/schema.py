@@ -1,4 +1,5 @@
 import graphene
+import graphql_jwt
 
 from graphene_django.types import DjangoObjectType
 from graphene_django.forms.mutation import DjangoModelFormMutation
@@ -127,34 +128,50 @@ class Query(graphene.ObjectType):
         return None
 
     def resolve_detail_register(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
         id = kwargs.get("id")
         if id is not None:
             return Register.objects.get(pk=id)
         return None
 
     def resolve_detail_register_row(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
         id = kwargs.get("id")
         if id is not None:
             return RegisterRow.objects.get(pk=id)
         return None
 
     def resolve_detail_statistics(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
         id = kwargs.get("id")
         if id is not None:
             return Statistics.objects.get(pk=id)
         return None
 
     def resolve_list_register(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
         return Register.objects.filter(user=info.context.user)
 
     def resolve_list_register_row(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
         return RegisterRow.objects.filter(user=info.context.user)
 
     def resolve_list_statistics(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
         return Statistics.objects.filter(user=info.context.user)
 
 
 class Mutations(graphene.ObjectType):
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
+
     mutation_register = RegisterMutation.Field()
     mutation_register_row = RegisterRowMutation.Field()
     mutation_statistics = StatisticsMutation.Field()

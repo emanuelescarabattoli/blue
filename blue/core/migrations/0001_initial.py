@@ -9,55 +9,53 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
+    dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
 
     operations = [
         migrations.CreateModel(
-            name='Register',
+            name="Register",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description', models.CharField(max_length=256)),
-                ('note', models.TextField(blank=True, default=None)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("description", models.CharField(max_length=256)),
+                ("note", models.TextField(blank=True, default=None)),
+                ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
-            name='Statistics',
+            name="Statistics",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description', models.CharField(max_length=256)),
-                ('note', models.TextField(blank=True, default=None)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("description", models.CharField(max_length=256)),
+                ("note", models.TextField(blank=True, default=None)),
+                ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
-            name='StatisticsRowStatistics',
+            name="StatisticsRowStatistics",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('parent_statistics', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.Statistics')),
-                ('statistics', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='child_statistics', to='core.Statistics')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("parent_statistics", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.Statistics")),
+                ("statistics", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="child_statistics", to="core.Statistics")),
             ],
         ),
         migrations.CreateModel(
-            name='StatisticsRowRegister',
+            name="StatisticsRowRegister",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('parent_statistics', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.Statistics')),
-                ('register', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.Register')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("parent_statistics", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.Statistics")),
+                ("register", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.Register")),
             ],
         ),
         migrations.CreateModel(
-            name='RegisterRow',
+            name="RegisterRow",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField()),
-                ('description', models.CharField(max_length=256)),
-                ('period', models.CharField(blank=True, default=None, max_length=256)),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('note', models.TextField(blank=True, default=None)),
-                ('register', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.Register')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("date", models.DateField()),
+                ("description", models.CharField(max_length=256)),
+                ("period", models.CharField(blank=True, default=None, max_length=256)),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=12)),
+                ("note", models.TextField(blank=True, default=None)),
+                ("register", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.Register")),
             ],
         ),
     ]

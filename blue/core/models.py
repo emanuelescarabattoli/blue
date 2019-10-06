@@ -78,8 +78,8 @@ def calculate_statistics_result(statistics_id):
     """
     This method is used to calculate the result of a statistics
     """
-    register_ids = StatisticsRowRegister.objects.filter(parent_statistics=statistics_id).values_list('register__id', flat=True)
-    statistics_ids = StatisticsRowStatistics.objects.filter(parent_statistics=statistics_id).values_list('statistics__id', flat=True)
+    register_ids = StatisticsRowRegister.objects.filter(parent_statistics=statistics_id).values_list("register__id", flat=True)
+    statistics_ids = StatisticsRowStatistics.objects.filter(parent_statistics=statistics_id).values_list("statistics__id", flat=True)
     return calculate_statistics(register_ids, statistics_ids)
 
 
@@ -87,7 +87,7 @@ def calculate_register_amount(register_id):
     """
     A function to calculate the sum of a register's rows
     """
-    return RegisterRow.objects.filter(register=register_id).aggregate(Sum('amount')).get("amount__sum")
+    return RegisterRow.objects.filter(register=register_id).aggregate(Sum("amount")).get("amount__sum")
 
 
 def calculate_registers_sum(register_ids):
@@ -105,7 +105,7 @@ def calculate_statistics(register_ids, statistics_ids, total=0):
     This function is used to calculate a single statistics result
     """
     for statistics_id in statistics_ids:
-        child_register_ids = StatisticsRowRegister.objects.filter(parent_statistics=statistics_id).values_list('register', flat=True)
-        child_statistics_ids = StatisticsRowStatistics.objects.filter(parent_statistics=statistics_id).values_list('statistics', flat=True)
+        child_register_ids = StatisticsRowRegister.objects.filter(parent_statistics=statistics_id).values_list("register", flat=True)
+        child_statistics_ids = StatisticsRowStatistics.objects.filter(parent_statistics=statistics_id).values_list("statistics", flat=True)
         total += calculate_statistics(child_register_ids, child_statistics_ids, total)
     return total + calculate_registers_sum(register_ids)
