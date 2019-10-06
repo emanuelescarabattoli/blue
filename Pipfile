@@ -4,11 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
 "psycopg2-binary" = "*"
 django-cors-headers = "*"
 graphene-django = "*"
 django-graphql-jwt = "*"
+django = "==2.2.6"
 
 [dev-packages]
 django-admin = "*"
