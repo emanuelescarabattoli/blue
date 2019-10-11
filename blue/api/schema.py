@@ -1,6 +1,6 @@
 import graphene
-import graphql_jwt
 
+from  graphql_jwt import ObtainJSONWebToken, Verify, Refresh
 from graphene_django.types import DjangoObjectType
 from graphene_django.forms.mutation import DjangoModelFormMutation
 
@@ -25,6 +25,16 @@ class RegisterType(DjangoObjectType):
 class RegisterRowType(DjangoObjectType):
     class Meta:
         model = RegisterRow
+
+
+class StatisticsRowRegisterType(DjangoObjectType):
+    class Meta:
+        model = StatisticsRowRegister
+
+
+class StatisticsRowStatisticsType(DjangoObjectType):
+    class Meta:
+        model = StatisticsRowStatistics
 
 
 class StatisticsType(DjangoObjectType):
@@ -54,13 +64,15 @@ class RegisterRowMutation(DjangoModelFormMutation):
     class Meta:
         form_class = RegisterRowForm
 
-    @classmethod
-    def perform_mutate(cls, form, info):
-        obj = form.save(commit=False)
-        obj.user = info.context.user
-        obj.save()
-        kwargs = {cls._meta.return_field_name: obj}
-        return cls(errors=[], **kwargs)
+
+class StatisticsRowRegisterMutation(DjangoModelFormMutation):
+    class Meta:
+        form_class = StatisticsRowRegisterForm
+
+
+class StatisticsRowStatisticsMutation(DjangoModelFormMutation):
+    class Meta:
+        form_class = StatisticsRowStatisticsForm
 
 
 class StatisticsMutation(DjangoModelFormMutation):
@@ -83,7 +95,6 @@ class RegisterDeleteMutation(graphene.Mutation):
     success = graphene.Boolean()
 
     def mutate(self, info, pk):
-
         Register.objects.filter(id=pk).delete()
         return RegisterDeleteMutation(success=True)
 
@@ -95,7 +106,6 @@ class RegisterRowDeleteMutation(graphene.Mutation):
     success = graphene.Boolean()
 
     def mutate(self, info, pk):
-
         RegisterRow.objects.filter(id=pk).delete()
         return RegisterRowDeleteMutation(success=True)
 
@@ -107,7 +117,6 @@ class StatisticsDeleteMutation(graphene.Mutation):
     success = graphene.Boolean()
 
     def mutate(self, info, pk):
-
         Statistics.objects.filter(id=pk).delete()
         return StatisticsDeleteMutation(success=True)
 
@@ -168,13 +177,16 @@ class Query(graphene.ObjectType):
 
 
 class Mutations(graphene.ObjectType):
-    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
-    verify_token = graphql_jwt.Verify.Field()
-    refresh_token = graphql_jwt.Refresh.Field()
+    token_auth = ObtainJSONWebToken.Field()
+    verify_token = Verify.Field()
+    refresh_token = Refresh.Field()
 
     mutation_register = RegisterMutation.Field()
     mutation_register_row = RegisterRowMutation.Field()
+
     mutation_statistics = StatisticsMutation.Field()
+    mutation_statistics_row_register = StatisticsRowRegisterMutation.Field()
+    mutation_statistics_row_statistics = StatisticsRowStatisticsMutation.Field()
 
     mutation_delete_register = RegisterDeleteMutation.Field()
     mutation_delete_register_row = RegisterRowDeleteMutation.Field()
