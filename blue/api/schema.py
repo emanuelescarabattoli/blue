@@ -127,10 +127,11 @@ class Query(graphene.ObjectType):
     detail_register = graphene.Field(RegisterType, id=graphene.Int())
     detail_statistics = graphene.Field(StatisticsType, id=graphene.Int())
     detail_register_row = graphene.Field(RegisterRowType, id=graphene.Int())
+    detail_statistics_row_register = graphene.Field(StatisticsRowRegisterType, id=graphene.Int())
+    detail_statistics_row_statistics = graphene.Field(StatisticsRowStatisticsType, id=graphene.Int())
 
     list_register = graphene.List(RegisterType)
     list_statistics = graphene.List(StatisticsType)
-
     list_statistics_row_register = graphene.List(StatisticsRowRegisterType, statistics=graphene.Int())
     list_statistics_row_statistics = graphene.List(StatisticsRowStatisticsType, statistics=graphene.Int())
 
@@ -153,6 +154,22 @@ class Query(graphene.ObjectType):
         id = kwargs.get("id")
         if id is not None:
             return RegisterRow.objects.get(pk=id)
+        return None
+
+    def resolve_detail_statistics_row_register(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        id = kwargs.get("id")
+        if id is not None:
+            return StatisticsRowRegister.objects.get(pk=id)
+        return None
+
+    def resolve_detail_statistics_row_statistics(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        id = kwargs.get("id")
+        if id is not None:
+            return StatisticsRowStatistics.objects.get(pk=id)
         return None
 
     def resolve_detail_statistics(self, info, **kwargs):
