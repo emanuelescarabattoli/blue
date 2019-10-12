@@ -131,6 +131,9 @@ class Query(graphene.ObjectType):
     list_register = graphene.List(RegisterType)
     list_statistics = graphene.List(StatisticsType)
 
+    list_statistics_row_register = graphene.List(StatisticsRowRegisterType, statistics=graphene.Int())
+    list_statistics_row_statistics = graphene.List(StatisticsRowStatisticsType, statistics=graphene.Int())
+
     def resolve_me(self, info, **kwargs):
         if info.context.user.is_authenticated:
             return MeObject(username=info.context.user.username)
@@ -165,15 +168,24 @@ class Query(graphene.ObjectType):
             raise Exception("Authentication credentials were not provided")
         return Register.objects.filter(user=info.context.user)
 
-    def resolve_list_register_row(self, info, **kwargs):
-        if not info.context.user.is_authenticated:
-            raise Exception("Authentication credentials were not provided")
-        return RegisterRow.objects.filter(user=info.context.user)
-
     def resolve_list_statistics(self, info, **kwargs):
         if not info.context.user.is_authenticated:
             raise Exception("Authentication credentials were not provided")
         return Statistics.objects.filter(user=info.context.user)
+
+    def resolve_list_statistics_row_register(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        statistics = kwargs.get("statistics")
+        if statistics is not None:
+            return StatisticsRowRegister.objects.filter(parent_statistics=statistics)
+
+    def resolve_list_statistics_row_statistics(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise Exception("Authentication credentials were not provided")
+        statistics = kwargs.get("statistics")
+        if statistics is not None:
+            return StatisticsRowStatistics.objects.filter(parent_statistics=statistics)
 
 
 class Mutations(graphene.ObjectType):
