@@ -107,8 +107,9 @@ def calculate_statistics(register_ids, statistics_ids, total=0):
     """
     This function is used to calculate a single statistics result
     """
+    amount = calculate_registers_sum(register_ids)
     for statistics_id in statistics_ids:
         child_register_ids = StatisticsRowRegister.objects.filter(parent_statistics=statistics_id).values_list("register", flat=True)
         child_statistics_ids = StatisticsRowStatistics.objects.filter(parent_statistics=statistics_id).values_list("statistics", flat=True)
-        total += calculate_statistics(child_register_ids, child_statistics_ids, total)
-    return total + calculate_registers_sum(register_ids)
+        amount += calculate_statistics(child_register_ids, child_statistics_ids, total)
+    return total + amount
