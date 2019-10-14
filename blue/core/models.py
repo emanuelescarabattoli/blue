@@ -96,7 +96,10 @@ def calculate_registers_sum(register_ids):
     """
     sum = 0
     for register_id in register_ids:
-        sum += calculate_register_amount(register_id)
+        amount = calculate_register_amount(register_id)
+        if amount is None:
+            amount = 0
+        sum += amount
     return sum
 
 
