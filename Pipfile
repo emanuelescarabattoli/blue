@@ -8,7 +8,7 @@ name = "pypi"
 django-cors-headers = "*"
 graphene-django = "*"
 django-graphql-jwt = "*"
-django = "==2.2.6"
+django = "==2.2.10"
 
 [dev-packages]
 django-admin = "*"
